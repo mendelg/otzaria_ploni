@@ -141,7 +141,7 @@ class TantivyDataProvider {
   /// 3. Splitting into lines and indexing each line separately
   addTextsToTantivy(TextBook book) async {
     final index = await engine;
-    var text = await book.text;
+    String text = await book.text;
     final title = book.title;
 
     // Check if book was already indexed using content hash
@@ -153,24 +153,40 @@ class TantivyDataProvider {
     }
 
     // Preprocess text by removing HTML and vowel marks
-    text = stripHtmlIfNeeded(text);
-    text = removeVolwels(text);
-    final texts = text.split('\n');
 
+    final texts = text.split('\n');
+    List<String> reference = [];
     // Index each line separately
     for (int i = 0; i < texts.length; i++) {
       if (!isIndexing.value) {
         return;
       }
-      index.addDocument(
-          id: BigInt.from(hashCode + i),
-          title: title,
-          text: texts[i],
-          segment: BigInt.from(i),
-          isPdf: false,
-          filePath: '');
+      String line = texts[i];
+      // get the reference from the headers
+      if (line.startsWith('<h')) {
+        if (reference.isNotEmpty &&
+            reference.any(
+                (element) => element.substring(0, 4) == line.substring(0, 4))) {
+          reference.removeRange(
+              reference.indexWhere(
+                  (element) => element.substring(0, 4) == line.substring(0, 4)),
+              reference.length);
+        }
+        reference.add(line);
+      } else {
+        line = stripHtmlIfNeeded(line);
+        line = removeVolwels(line);
+        index.addDocument(
+            id: BigInt.from(hashCode + i),
+            title: title,
+            reference: stripHtmlIfNeeded(reference.join(', ')),
+            topics: book.topics,
+            text: line,
+            segment: BigInt.from(i),
+            isPdf: false,
+            filePath: '');
+      }
     }
-
     await index.commit();
     booksDone.add(hash);
     saveBooksDoneToDisk();
@@ -213,6 +229,8 @@ class TantivyDataProvider {
         index.addDocument(
             id: BigInt.from(hashCode + i + j),
             title: title,
+            topics: book.topics,
+            reference: '{title}, עמוד ${i + 1}',
             text: texts[j],
             segment: BigInt.from(i),
             isPdf: true,

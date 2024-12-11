@@ -56,7 +56,7 @@ dependencies:
   msix: ^3.16.7
   path_provider: ^2.0.15
   html: ^0.15.1
-  pdfrx: ^1.0.65
+  pdfrx: 1.0.65
   url_launcher: ^6.3.0
   flutter_html: ^3.0.0-beta.2
   scrollable_positioned_list: ^0.3.8
@@ -86,7 +86,7 @@ dependencies:
     #path: ../search_engine
     git:
       url: https://github.com/Sivan22/otzaria_search_engine
-      ref: main
+      ref: add_ref_and_topics
   flutter_archive: ^6.0.3
 dependency_overrides:
   #  it forces the version of the intl package to be 0.19.0 across all dependencies, even if some packages specify a different compatible version.

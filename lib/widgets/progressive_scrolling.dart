@@ -10,6 +10,8 @@ class ProgressiveScroll extends StatefulWidget {
   final double maxSpeed;
   final double accelerationFactor;
   final double curve;
+  final FocusNode? focusNode;
+  final bool autofocus;
 
   const ProgressiveScroll({
     Key? key,
@@ -18,6 +20,8 @@ class ProgressiveScroll extends StatefulWidget {
     this.maxSpeed = 5000.0,
     this.accelerationFactor = 0.1,
     this.curve = 2.0,
+    this.focusNode,
+    this.autofocus = false,
   }) : super(key: key);
 
   @override
@@ -88,9 +92,9 @@ class _ProgressiveScrollState extends State<ProgressiveScroll> {
   @override
   Widget build(BuildContext context) {
     return KeyboardListener(
-      focusNode: FocusNode(),
+      focusNode: widget.focusNode ?? FocusNode(),
       onKeyEvent: _handleKeyEvent,
-      autofocus: true,
+      autofocus: widget.autofocus,
       child: widget.child,
     );
   }

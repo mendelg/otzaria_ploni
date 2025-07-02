@@ -45,6 +45,7 @@ class _TextBookViewerBlocState extends State<TextBookViewerBloc>
     with TickerProviderStateMixin {
   final FocusNode textSearchFocusNode = FocusNode();
   final FocusNode navigationSearchFocusNode = FocusNode();
+  final FocusNode viewerFocusNode = FocusNode();
   late TabController tabController;
 
   String? encodeQueryParameters(Map<String, String> params) {
@@ -65,6 +66,7 @@ class _TextBookViewerBlocState extends State<TextBookViewerBloc>
     tabController.dispose();
     textSearchFocusNode.dispose();
     navigationSearchFocusNode.dispose();
+    viewerFocusNode.dispose();
     super.dispose();
   }
 
@@ -633,6 +635,7 @@ $selectedText
                 ),
               );
         },
+        onTap: () => viewerFocusNode.requestFocus(),
         child: NotificationListener<UserScrollNotification>(
           onNotification: (scrollNotification) {
             if (!state.pinLeftPane) {
@@ -652,8 +655,8 @@ $selectedText
               },
             },
             child: Focus(
-              focusNode: FocusNode(),
-              autofocus: !Platform.isAndroid,
+              focusNode: viewerFocusNode,
+              autofocus: false,
               child: _buildSplitedOrCombinedView(state),
             ),
           ),
@@ -669,6 +672,7 @@ $selectedText
         openBookCallback: widget.openBookCallback,
         searchTextController: TextEditingValue(text: state.searchText),
         tab: widget.tab,
+        focusNode: viewerFocusNode,
       );
     }
 
@@ -691,6 +695,7 @@ $selectedText
       openBookCallback: widget.openBookCallback,
       showSplitedView: ValueNotifier(state.showSplitView),
       tab: widget.tab,
+      focusNode: viewerFocusNode,
     );
   }
 

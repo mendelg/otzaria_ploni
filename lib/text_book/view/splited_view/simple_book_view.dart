@@ -21,6 +21,7 @@ class SimpleBookView extends StatefulWidget {
     required this.textSize,
     required this.showSplitedView,
     required this.tab,
+    required this.focusNode,
   });
 
   final List<String> data;
@@ -28,6 +29,7 @@ class SimpleBookView extends StatefulWidget {
   final bool showSplitedView;
   final double textSize;
   final TextBookTab tab;
+  final FocusNode focusNode;
 
   @override
   State<SimpleBookView> createState() => _SimpleBookViewState();
@@ -43,8 +45,11 @@ class _SimpleBookViewState extends State<SimpleBookView> {
           maxSpeed: 10000.0,
           curve: 10.0,
           accelerationFactor: 5,
-          child: SelectionArea(
-              child: ScrollablePositionedList.builder(
+          focusNode: widget.focusNode,
+          child: GestureDetector(
+              onTap: () => widget.focusNode.requestFocus(),
+              child: SelectionArea(
+                  child: ScrollablePositionedList.builder(
                   key: PageStorageKey(widget.tab),
                   initialScrollIndex: state.visibleIndices.first,
                   itemPositionsListener: state.positionsListener,
@@ -63,9 +68,12 @@ class _SimpleBookViewState extends State<SimpleBookView> {
                         data = replaceHolyNames(data);
                       }
                       return InkWell(
-                        onTap: () => context
-                            .read<TextBookBloc>()
-                            .add(UpdateSelectedIndex(index)),
+                        onTap: () {
+                          widget.focusNode.requestFocus();
+                          context
+                              .read<TextBookBloc>()
+                              .add(UpdateSelectedIndex(index));
+                        },
                         child: Html(
                             // remove nikud if needed
                             data: state.removeNikud

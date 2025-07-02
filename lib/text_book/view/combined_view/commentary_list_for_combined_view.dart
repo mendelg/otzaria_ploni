@@ -13,6 +13,7 @@ class CommentaryListForCombinedView extends StatefulWidget {
   final double fontSize;
   final int index;
   final bool showSplitView;
+  final FocusNode focusNode;
 
   const CommentaryListForCombinedView({
     super.key,
@@ -20,6 +21,7 @@ class CommentaryListForCombinedView extends StatefulWidget {
     required this.fontSize,
     required this.index,
     required this.showSplitView,
+    required this.focusNode,
   });
 
   @override
@@ -51,6 +53,7 @@ class _CommentaryListForCombinedViewState
                     maxSpeed: 10000.0,
                     curve: 10.0,
                     accelerationFactor: 5,
+                    focusNode: widget.focusNode,
                     child: ScrollablePositionedList.builder(
                       key: PageStorageKey(thisLinksSnapshot.data![0].heRef),
                       physics: const ClampingScrollPhysics(),
@@ -58,6 +61,7 @@ class _CommentaryListForCombinedViewState
                       shrinkWrap: true,
                       itemCount: thisLinksSnapshot.data!.length,
                       itemBuilder: (context, index1) => GestureDetector(
+                        onTap: () => widget.focusNode.requestFocus(),
                         child: ListTile(
                           focusNode: FocusNode(),
                           title: Text(thisLinksSnapshot.data![index1].heRef),

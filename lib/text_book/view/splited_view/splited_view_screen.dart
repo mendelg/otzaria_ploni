@@ -15,11 +15,13 @@ class SplitedViewScreen extends StatelessWidget {
     required this.openBookCallback,
     required this.searchTextController,
     required this.tab,
+    required this.focusNode,
   });
   final List<String> content;
   final void Function(OpenedTab) openBookCallback;
   final TextEditingValue searchTextController;
   final TextBookTab tab;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class SplitedViewScreen extends StatelessWidget {
               fontSize: (state as TextBookLoaded).fontSize,
               openBookCallback: openBookCallback,
               showSplitView: state.showSplitView,
+              focusNode: focusNode,
             ),
           ),
           SimpleBookView(
@@ -48,6 +51,7 @@ class SplitedViewScreen extends StatelessWidget {
             openBookCallback: openBookCallback,
             showSplitedView: state.showSplitView,
             tab: tab,
+            focusNode: focusNode,
           )
         ],
       ),

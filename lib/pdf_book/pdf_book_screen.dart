@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,6 +43,7 @@ class _PdfBookScreenState extends State<PdfBookScreen>
   int _currentLeftPaneTabIndex = 0;
   final FocusNode _searchFieldFocusNode = FocusNode();
   final FocusNode _navigationFieldFocusNode = FocusNode();
+  final FocusNode _viewerFocusNode = FocusNode();
 
   void _ensureSearchTabIsActive() {
     widget.tab.showLeftPane.value = true;
@@ -146,6 +146,8 @@ class _PdfBookScreenState extends State<PdfBookScreen>
         } else if (_leftPaneTabController!.index == 0) {
           _navigationFieldFocusNode.requestFocus();
         }
+      } else {
+        _viewerFocusNode.requestFocus();
       }
     });
   }
@@ -171,6 +173,7 @@ class _PdfBookScreenState extends State<PdfBookScreen>
     _leftPaneTabController?.dispose();
     _searchFieldFocusNode.dispose();
     _navigationFieldFocusNode.dispose();
+    _viewerFocusNode.dispose();
 
     super.dispose();
   }
@@ -180,20 +183,19 @@ class _PdfBookScreenState extends State<PdfBookScreen>
     super.build(context);
     return LayoutBuilder(builder: (context, constrains) {
       final wideScreen = (MediaQuery.of(context).size.width >= 600);
-      return CallbackShortcuts(
-        bindings: <ShortcutActivator, VoidCallback>{
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyF):
-              _ensureSearchTabIsActive,
-          LogicalKeySet(LogicalKeyboardKey.arrowRight): _goNextPage,
-          LogicalKeySet(LogicalKeyboardKey.arrowLeft): _goPreviousPage,
-          LogicalKeySet(LogicalKeyboardKey.arrowDown): _goNextPage,
-          LogicalKeySet(LogicalKeyboardKey.arrowUp): _goPreviousPage,
-          LogicalKeySet(LogicalKeyboardKey.pageDown): _goNextPage,
-          LogicalKeySet(LogicalKeyboardKey.pageUp): _goPreviousPage,
-        },
-        child: Focus(
-          focusNode: FocusNode(),
-          autofocus: !Platform.isAndroid,
+      return Focus(
+        focusNode: _viewerFocusNode,
+        child: CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyF):
+                _ensureSearchTabIsActive,
+            LogicalKeySet(LogicalKeyboardKey.arrowRight): _goNextPageIfFocused,
+            LogicalKeySet(LogicalKeyboardKey.arrowLeft): _goPreviousPageIfFocused,
+            LogicalKeySet(LogicalKeyboardKey.arrowDown): _goNextPageIfFocused,
+            LogicalKeySet(LogicalKeyboardKey.arrowUp): _goPreviousPageIfFocused,
+            LogicalKeySet(LogicalKeyboardKey.pageDown): _goNextPageIfFocused,
+            LogicalKeySet(LogicalKeyboardKey.pageUp): _goPreviousPageIfFocused,
+          },
           child: Scaffold(
           appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
@@ -355,6 +357,7 @@ class _PdfBookScreenState extends State<PdfBookScreen>
                             if (!widget.tab.pinLeftPane.value) {
                               widget.tab.showLeftPane.value = false;
                             }
+                            _viewerFocusNode.requestFocus();
                           },
                           viewerOverlayBuilder: (context, size, handleLinkTap) => [
                         PdfViewerScrollThumb(
@@ -564,12 +567,24 @@ class _PdfBookScreenState extends State<PdfBookScreen>
     }
   }
 
+  void _goNextPageIfFocused() {
+    if (_viewerFocusNode.hasFocus) {
+      _goNextPage();
+    }
+  }
+
   void _goPreviousPage() {
     if (widget.tab.pdfViewerController.isReady) {
       final prevPage = max(
           widget.tab.pdfViewerController.pageNumber! - 1,
           1);
       widget.tab.pdfViewerController.goToPage(pageNumber: prevPage);
+    }
+  }
+
+  void _goPreviousPageIfFocused() {
+    if (_viewerFocusNode.hasFocus) {
+      _goPreviousPage();
     }
   }
 

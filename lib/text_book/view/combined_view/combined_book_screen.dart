@@ -26,6 +26,7 @@ class CombinedView extends StatefulWidget {
     required this.textSize,
     required this.showSplitedView,
     required this.tab,
+    required this.focusNode,
   });
 
   final List<String> data;
@@ -33,6 +34,7 @@ class CombinedView extends StatefulWidget {
   final ValueNotifier<bool> showSplitedView;
   final double textSize;
   final TextBookTab tab;
+  final FocusNode focusNode;
 
   @override
   State<CombinedView> createState() => _CombinedViewState();
@@ -51,7 +53,10 @@ class _CombinedViewState extends State<CombinedView> {
               curve: 10.0,
               accelerationFactor: 5,
               scrollController: state.scrollOffsetController,
-              child: SelectionArea(child: buildOuterList(state)));
+              focusNode: widget.focusNode,
+              child: GestureDetector(
+                  onTap: () => widget.focusNode.requestFocus(),
+                  child: SelectionArea(child: buildOuterList(state))));
         });
   }
 
@@ -79,6 +84,7 @@ class _CombinedViewState extends State<CombinedView> {
         iconColor: Colors.transparent,
         tilePadding: const EdgeInsets.all(0.0),
         collapsedIconColor: Colors.transparent,
+        onExpansionChanged: (_) => widget.focusNode.requestFocus(),
         title: BlocBuilder<SettingsBloc, SettingsState>(
             builder: (context, settingsState) {
           String data = widget.data[index];
@@ -111,6 +117,7 @@ class _CombinedViewState extends State<CombinedView> {
                   fontSize: widget.textSize,
                   openBookCallback: widget.openBookCallback,
                   showSplitView: false,
+                  focusNode: widget.focusNode,
                 )
         ]);
   }

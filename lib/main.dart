@@ -38,8 +38,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:otzaria/app_bloc_observer.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:otzaria/data/data_providers/hive_data_provider.dart';
+import 'package:otzaria/indexing/library_watcher.dart';
+import 'package:otzaria/data/data_providers/tantivy_data_provider.dart';
+import 'package:otzaria/indexing/repository/indexing_repository.dart';
 
 import 'package:search_engine/search_engine.dart';
+
+final LibraryWatcher _libraryWatcher = LibraryWatcher(
+    IndexingRepository(TantivyDataProvider.instance),
+    TantivyDataProvider.instance);
 
 /// Application entry point that initializes necessary components and launches the app.
 ///
@@ -77,6 +84,7 @@ void main() async {
   Bloc.observer = AppBlocObserver();
 
   await initialize();
+  _libraryWatcher.start();
 
   final historyRepository = HistoryRepository();
 

@@ -72,6 +72,24 @@ class IndexingRepository {
     _tantivyDataProvider.isIndexing.value = false;
   }
 
+  /// Index a single [book].
+  Future<void> indexBook(Book book) async {
+    _tantivyDataProvider.isIndexing.value = true;
+    try {
+      if (book is TextBook) {
+        await _indexTextBook(book);
+        _tantivyDataProvider.booksDone.add("${book.title}textBook");
+      } else if (book is PdfBook) {
+        await _indexPdfBook(book);
+        _tantivyDataProvider.booksDone.add("${book.title}pdfBook");
+      }
+      saveIndexedBooks();
+    } catch (e) {
+      debugPrint('Error adding ${book.title} to index: $e');
+    }
+    _tantivyDataProvider.isIndexing.value = false;
+  }
+
   /// Indexes a text-based book by processing its content and adding it to the search index and reference index.
   Future<void> _indexTextBook(TextBook book) async {
     final index = await _tantivyDataProvider.engine;

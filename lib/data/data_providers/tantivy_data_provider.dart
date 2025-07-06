@@ -142,4 +142,12 @@ class TantivyDataProvider {
     booksDone.clear();
     saveBooksDoneToDisk();
   }
+
+  /// Removes all indexed documents matching [filePath].
+  Future<void> deleteFileFromIndex(String filePath) async {
+    final index = await engine;
+    await index.deleteDocuments(field: 'filePath', value: filePath);
+    booksDone.removeWhere((e) => e.contains(filePath));
+    saveBooksDoneToDisk();
+  }
 }
